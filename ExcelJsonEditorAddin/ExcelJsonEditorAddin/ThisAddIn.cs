@@ -91,7 +91,29 @@ namespace ExcelJsonEditorAddin
             //sheet.Protect();
             Application.ScreenUpdating = true;
 
+            book.SheetBeforeDoubleClick += Book_SheetBeforeDoubleClick;
+            book.SheetBeforeRightClick += Book_SheetBeforeRightClick;
             book.AfterSave += Book_AfterSave;
+        }
+
+        private void Book_SheetBeforeDoubleClick(object sh, Excel.Range target, ref bool cancel)
+        {
+            var book = Application.ActiveWorkbook;
+            if (_bookDatas.Any(x => x.WorkbookName == book.Name))
+            {
+                var bookData = _bookDatas.First(x => x.WorkbookName == book.Name);
+                cancel = bookData.RootJsonToken.OnDoubleClick(bookData.Workbook, target);
+            }
+        }
+
+        private void Book_SheetBeforeRightClick(object sh, Excel.Range target, ref bool cancel)
+        {
+            var book = Application.ActiveWorkbook;
+            if (_bookDatas.Any(x => x.WorkbookName == book.Name))
+            {
+                var bookData = _bookDatas.First(x => x.WorkbookName == book.Name);
+                cancel = bookData.RootJsonToken.OnRightClick(target);
+            }
         }
 
         private void Book_AfterSave(bool success)

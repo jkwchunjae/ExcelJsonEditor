@@ -12,11 +12,12 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
     {
         JsonTokenType Type();
         JToken GetToken();
+        string Path();
 
         void Dump(Excel.Worksheet worksheet);
         void Dump(Excel.Range cell);
 
-        bool OnDoubleClick(Excel.Range target);
+        bool OnDoubleClick(Excel.Workbook book, Excel.Range target);
         bool OnRightClick(Excel.Range target);
         void OnChangeValue(Excel.Range target);
     }

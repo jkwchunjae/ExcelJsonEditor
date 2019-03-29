@@ -16,6 +16,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public JsonTokenType Type() => JsonTokenType.Title;
         public JToken GetToken() => null;
+        public string Path() => GetToken()?.Path;
 
         public JsonTitle(IEnumerable<JProperty> jProperties)
         {
@@ -31,7 +32,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             cell.Value2 = Title;
         }
 
-        public bool OnDoubleClick(Excel.Range target)
+        public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)
         {
             return true;
         }

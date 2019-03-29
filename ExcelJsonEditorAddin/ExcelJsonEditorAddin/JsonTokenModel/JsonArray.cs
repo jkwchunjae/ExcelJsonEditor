@@ -16,6 +16,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public JsonTokenType Type() => _token.Type.ConvertToJsonTokenType();
         public JToken GetToken() => _token;
+        public string Path() => GetToken()?.Path;
 
         public JsonArray(JArray jArray)
         {
@@ -51,9 +52,19 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             cell.Value2 = "[array]";
         }
 
-        public bool OnDoubleClick(Excel.Range target)
+        public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)
         {
-            return false;
+            if (_cellDatas.Empty(x => x.Cell.Address == target.Address))
+            {
+                return false;
+            }
+
+            var cellData = _cellDatas.First(x => x.Cell.Address == target.Address);
+            if (cellData.Value.CanSpreadType())
+            {
+                book.SpreadJsonToken(_sheet, cellData.Value);
+            }
+            return true;
         }
 
         public bool OnRightClick(Excel.Range target)

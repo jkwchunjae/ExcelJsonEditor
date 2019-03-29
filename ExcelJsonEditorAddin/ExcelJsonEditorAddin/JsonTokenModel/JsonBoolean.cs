@@ -9,6 +9,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public JsonTokenType Type() => _token.Type.ConvertToJsonTokenType();
         public JToken GetToken() => _token;
+        public string Path() => GetToken()?.Path;
 
         public JsonBoolean(JValue jValue)
         {
@@ -24,7 +25,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             cell.Value2 = _token.Value;
         }
 
-        public bool OnDoubleClick(Excel.Range target)
+        public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)
         {
             return true;
         }

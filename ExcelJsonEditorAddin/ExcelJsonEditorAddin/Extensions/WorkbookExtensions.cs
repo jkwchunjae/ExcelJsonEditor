@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using ExcelJsonEditorAddin.Theme;
 using System.Drawing;
+using ExcelJsonEditorAddin.JsonTokenModel;
 using Microsoft.Office.Core;
 
 namespace ExcelJsonEditorAddin
@@ -100,6 +101,24 @@ namespace ExcelJsonEditorAddin
             {
                 style.Borders[index].LineStyle = Excel.XlLineStyle.xlLineStyleNone;
             });
+        }
+
+        public static Excel.Workbook SpreadJsonToken(this Excel.Workbook book, Excel.Worksheet currentSheet, IJsonToken jsonToken)
+        {
+            var sheetName = jsonToken.Path().Replace("[", "").Replace("]", "");
+
+            if (book.Sheets.ToEnumerable().Any(x => x.Name == sheetName))
+            {
+                Excel.Worksheet sht = book.Sheets[sheetName];
+                sht.Activate();
+            }
+            else
+            {
+                Excel.Worksheet sheet = book.Sheets.Add(After: currentSheet);
+                sheet.Name = sheetName;
+                jsonToken.Dump(sheet);
+            }
+            return book;
         }
     }
 }
