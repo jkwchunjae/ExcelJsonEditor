@@ -34,18 +34,24 @@ namespace ExcelJsonEditorAddin
             _customTaskPane = this.CustomTaskPanes.Add(_startupControl, "Excel Json Editor");
             _customTaskPane.Visible = true;
 
-            //Application.ActiveWorkbook.ChangeTheme(_settings.Theme);
+            if (_settings.SetDefaultExcelTheme)
+            {
+                Application.ActiveWorkbook.ChangeTheme(_settings.Theme);
+            }
 
             var ribbon = Globals.Ribbons.GetRibbon<ExcelJsonEditorRibbon>();
-            ribbon.ChangeTheme += Ribbon_ChangeTheme;
-            ribbon.SetCheckBox(_settings.Theme);
+            ribbon.ChangeSettings += Ribbon_ChangeSettings;
+            ribbon.Initialize(_settings);
         }
 
-        private void Ribbon_ChangeTheme(object sender, ThemeType themeType)
+        private void Ribbon_ChangeSettings(object sender, Settings settings)
         {
-            _settings.Theme = themeType;
+            if (_settings.Theme != settings.Theme)
+            {
+                _bookDatas.ForEach(x => x.Workbook.ChangeTheme(settings.Theme));
+            }
+            _settings = settings;
             _settings.Save();
-            _bookDatas.ForEach(x => x.Workbook.ChangeTheme(themeType));
         }
 
         private void _startupControl_OpenFiles(object sender, string filePath)

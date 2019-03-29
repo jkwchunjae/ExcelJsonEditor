@@ -12,6 +12,7 @@ namespace ExcelJsonEditorAddin.Config
     public class Settings
     {
         public ThemeType Theme { get; set; } = ThemeType.White;
+        public bool SetDefaultExcelTheme { get; set; } = false;
 
         public static Settings Open()
         {

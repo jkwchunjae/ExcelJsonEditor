@@ -36,6 +36,7 @@
         {
             this.JsonEditorTab = this.Factory.CreateRibbonTab();
             this.ThemeGroup = this.Factory.CreateRibbonGroup();
+            this.SetThemeDefaultCheckBox = this.Factory.CreateRibbonCheckBox();
             this.ThemeWhiteCheckbox = this.Factory.CreateRibbonCheckBox();
             this.ThemeDarkCheckbox = this.Factory.CreateRibbonCheckBox();
             this.group1 = this.Factory.CreateRibbonGroup();
@@ -54,22 +55,30 @@
             // 
             // ThemeGroup
             // 
+            this.ThemeGroup.Items.Add(this.SetThemeDefaultCheckBox);
             this.ThemeGroup.Items.Add(this.ThemeWhiteCheckbox);
             this.ThemeGroup.Items.Add(this.ThemeDarkCheckbox);
             this.ThemeGroup.Label = "Theme";
             this.ThemeGroup.Name = "ThemeGroup";
             // 
+            // SetThemeDefaultCheckBox
+            // 
+            this.SetThemeDefaultCheckBox.Label = "SetDefault";
+            this.SetThemeDefaultCheckBox.Name = "SetThemeDefaultCheckBox";
+            this.SetThemeDefaultCheckBox.ScreenTip = "Set theme normal excel";
+            this.SetThemeDefaultCheckBox.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.SetThemeDefaultCheckBox_Click);
+            // 
             // ThemeWhiteCheckbox
             // 
             this.ThemeWhiteCheckbox.Label = "White";
             this.ThemeWhiteCheckbox.Name = "ThemeWhiteCheckbox";
-            this.ThemeWhiteCheckbox.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ThemeWhiteCheckbox_Click);
+            this.ThemeWhiteCheckbox.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ThemeCheckBox_Click);
             // 
             // ThemeDarkCheckbox
             // 
             this.ThemeDarkCheckbox.Label = "Dark";
             this.ThemeDarkCheckbox.Name = "ThemeDarkCheckbox";
-            this.ThemeDarkCheckbox.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ThemeDarkCheckbox_Click);
+            this.ThemeDarkCheckbox.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ThemeCheckBox_Click);
             // 
             // group1
             // 
@@ -106,6 +115,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox ThemeDarkCheckbox;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton OpenJsonButton;
+        internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox SetThemeDefaultCheckBox;
     }
 
     partial class ThisRibbonCollection

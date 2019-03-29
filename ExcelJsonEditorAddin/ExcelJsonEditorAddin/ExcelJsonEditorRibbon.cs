@@ -3,19 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using ExcelJsonEditorAddin.Config;
 using ExcelJsonEditorAddin.Theme;
 using Microsoft.Office.Tools.Ribbon;
+using Newtonsoft.Json;
 
 namespace ExcelJsonEditorAddin
 {
     public partial class ExcelJsonEditorRibbon
     {
-        public event EventHandler<ThemeType> ChangeTheme;
+        public event EventHandler<Settings> ChangeSettings;
 
+        private Settings _settings;
         private Dictionary<ThemeType, RibbonCheckBox> _themeCheckBoxDic
             = new Dictionary<ThemeType, RibbonCheckBox>();
 
-        public void SetCheckBox(ThemeType themeType)
+        public void Initialize(Settings settings)
+        {
+            _settings = JsonConvert.DeserializeObject<Settings>(JsonConvert.SerializeObject(settings));
+            SetThemeDefaultCheckBox.Checked = settings.SetDefaultExcelTheme;
+            SetThemeCheckBox(settings.Theme);
+        }
+
+        private void SetThemeCheckBox(ThemeType themeType)
         {
             _themeCheckBoxDic.ToList()
                 .ForEach(x => x.Value.Checked = themeType == x.Key);
@@ -27,40 +37,22 @@ namespace ExcelJsonEditorAddin
             _themeCheckBoxDic[ThemeType.Dark] = ThemeDarkCheckbox;
         }
 
-        private void ThemeWhiteCheckbox_Click(object sender, RibbonControlEventArgs e)
+        private void ThemeCheckBox_Click(object sender, RibbonControlEventArgs e)
         {
-            if (ThemeWhiteCheckbox.Checked == false)
+            var checkbox = (RibbonCheckBox)sender;
+            if (checkbox.Checked)
             {
-                ThemeWhiteCheckbox.Checked = true;
-            }
-            else
-            {
-                ChangeTheme?.Invoke(sender, ThemeType.White);
-                ThemeDarkCheckbox.Checked = false;
+                var themeType = _themeCheckBoxDic.First(x => x.Value == checkbox).Key;
+                _settings.Theme = themeType;
+                ChangeSettings?.Invoke(sender, _settings);
+                SetThemeCheckBox(themeType);
             }
         }
 
-        private void ThemeDarkCheckbox_Click(object sender, RibbonControlEventArgs e)
+        private void SetThemeDefaultCheckBox_Click(object sender, RibbonControlEventArgs e)
         {
-            if (ThemeDarkCheckbox.Checked == false)
-            {
-                ThemeDarkCheckbox.Checked = true;
-            }
-            else
-            {
-                ChangeTheme?.Invoke(sender, ThemeType.Dark);
-                ThemeWhiteCheckbox.Checked = false;
-            }
-        }
-
-        private void ThemeCheckBox_Click(RibbonCheckBox sender)
-        {
-            if (sender.Checked)
-            {
-                var themeType = _themeCheckBoxDic.First(x => x.Value == sender).Key;
-                ChangeTheme?.Invoke(sender, themeType);
-                SetCheckBox(themeType);
-            }
+            _settings.SetDefaultExcelTheme = ((RibbonCheckBox)sender).Checked;
+            ChangeSettings?.Invoke(sender, _settings);
         }
     }
 }
