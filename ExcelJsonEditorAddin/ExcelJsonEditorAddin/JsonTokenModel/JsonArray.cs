@@ -23,7 +23,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _token = jArray;
         }
 
-        public void Dump(Excel.Worksheet sheet)
+        public void Spread(Excel.Worksheet sheet)
         {
             _sheet = sheet;
             sheet.Range["A1"].Value2 = _token.Path;
@@ -43,11 +43,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
                 SetNamedRange(sheet, _cellDatas.Where(x => x.Type == DataType.Title));
 
-                _cellDatas.ForEach(x => x.Value.Dump(x.Cell));
+                _cellDatas.ForEach(x => x.Value.Spread(x.Cell));
             }
         }
 
-        public void Dump(Excel.Range cell)
+        public void Spread(Excel.Range cell)
         {
             cell.Value2 = "[array]";
         }

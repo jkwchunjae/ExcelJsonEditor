@@ -23,11 +23,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _tokens = jProperties.ToList();
         }
 
-        public void Dump(Excel.Worksheet ws)
+        public void Spread(Excel.Worksheet ws)
         {
         }
 
-        public void Dump(Excel.Range cell)
+        public void Spread(Excel.Range cell)
         {
             cell.Value2 = Title;
         }

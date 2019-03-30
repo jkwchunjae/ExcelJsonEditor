@@ -17,11 +17,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         }
 
-        public void Dump(Excel.Worksheet ws)
+        public void Spread(Excel.Worksheet ws)
         {
         }
 
-        public void Dump(Excel.Range cell)
+        public void Spread(Excel.Range cell)
         {
             cell.Value2 = (string)_token.Value;
             if (cell.Value2.ToString() != (string) _token.Value)

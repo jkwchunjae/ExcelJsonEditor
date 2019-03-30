@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using ExcelJsonEditorAddin.Theme;
 using ExcelJsonEditorAddin.Config;
+using ExcelJsonEditorAddin.Extensions;
 
 namespace ExcelJsonEditorAddin
 {
@@ -21,8 +22,7 @@ namespace ExcelJsonEditorAddin
         private StartupControl _startupControl;
         private CustomTaskPane _customTaskPane;
 
-        private List<BookData> _bookDatas = new List<BookData>();
-
+        private List<Excel.Workbook> _workbookList = new List<Excel.Workbook>();
         private Settings _settings = new Settings();
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
@@ -48,7 +48,7 @@ namespace ExcelJsonEditorAddin
         {
             if (_settings.Theme != settings.Theme)
             {
-                _bookDatas.ForEach(x => x.Workbook.ChangeTheme(settings.Theme));
+                _workbookList.ForEach(x => x.ChangeTheme(settings.Theme));
             }
             _settings = settings;
             _settings.Save();
@@ -56,88 +56,17 @@ namespace ExcelJsonEditorAddin
 
         private void _startupControl_OpenFiles(object sender, string filePath)
         {
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var jtoken = JsonConvert.DeserializeObject<JToken>(File.ReadAllText(filePath, Encoding.UTF8));
-            var token = jtoken.CreateJsonToken();
-
             Excel.Workbook book = Application.Workbooks.Add();
 
-            book.ChangeTheme(_settings.Theme);
-
-            _bookDatas.Add(new BookData
-            {
-                WorkbookName = $"{fileName}.xlsx",
-                RootJsonToken = token,
-                Workbook = book,
-                JsonPath = filePath,
-            });
-
-            Excel.Worksheet sheet = book.Sheets.ToEnumerable().First();
-            sheet.Name = fileName;
-
-            try
-            {
-                book.SaveForJsonEditor(fileName);
+            try {
+                book.Initialize(filePath, _settings);
+                _workbookList.Add(book);
             }
             catch
             {
                 book.Close(SaveChanges: false);
                 return;
             }
-
-            Application.ScreenUpdating = false;
-            token.Dump(sheet);
-            sheet.Change += token.OnChangeValue;
-            //sheet.Protect();
-            Application.ScreenUpdating = true;
-
-            book.SheetBeforeDoubleClick += Book_SheetBeforeDoubleClick;
-            book.SheetBeforeRightClick += Book_SheetBeforeRightClick;
-            book.AfterSave += Book_AfterSave;
-        }
-
-        private void Book_SheetBeforeDoubleClick(object sh, Excel.Range target, ref bool cancel)
-        {
-            var book = Application.ActiveWorkbook;
-            if (_bookDatas.Any(x => x.WorkbookName == book.Name))
-            {
-                var bookData = _bookDatas.First(x => x.WorkbookName == book.Name);
-                cancel = bookData.RootJsonToken.OnDoubleClick(bookData.Workbook, target);
-            }
-        }
-
-        private void Book_SheetBeforeRightClick(object sh, Excel.Range target, ref bool cancel)
-        {
-            var book = Application.ActiveWorkbook;
-            if (_bookDatas.Any(x => x.WorkbookName == book.Name))
-            {
-                var bookData = _bookDatas.First(x => x.WorkbookName == book.Name);
-                cancel = bookData.RootJsonToken.OnRightClick(target);
-            }
-        }
-
-        private void Book_AfterSave(bool success)
-        {
-            if (!success)
-            {
-                return;
-            }
-
-            var book = Application.ActiveWorkbook;
-
-            if (_bookDatas.Empty(x => x.WorkbookName == book.Name))
-            {
-                MessageBox.Show($"Unknown workbook. (WorkbookName: {book.Name})");
-                return;
-            }
-            var bookData = _bookDatas.First(x => x.WorkbookName == book.Name);
-            File.WriteAllText(bookData.JsonPath, bookData.RootJsonToken.GetToken().Serialize(Formatting.Indented), Encoding.UTF8);
-        }
-
-        private void Ws_BeforeDoubleClick(Excel.Range Target, ref bool Cancel)
-        {
-            Target.Offset[1, 0].Value2 = Target.Value2;
-            Cancel = true;
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)

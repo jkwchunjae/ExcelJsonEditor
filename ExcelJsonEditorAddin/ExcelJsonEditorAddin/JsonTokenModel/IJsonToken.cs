@@ -14,8 +14,8 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         JToken GetToken();
         string Path();
 
-        void Dump(Excel.Worksheet worksheet);
-        void Dump(Excel.Range cell);
+        void Spread(Excel.Worksheet worksheet);
+        void Spread(Excel.Range cell);
 
         bool OnDoubleClick(Excel.Workbook book, Excel.Range target);
         bool OnRightClick(Excel.Range target);

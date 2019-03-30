@@ -29,7 +29,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _cellDatas = MakeCellData(null, _token).ToList();
         }
 
-        public void Dump(Excel.Worksheet sheet)
+        public void Spread(Excel.Worksheet sheet)
         {
             _sheet = sheet;
             //((Excel.Range)_sheet.Range[_titleRow, 1]).Value2 = "Key";
@@ -37,10 +37,10 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
             _cellDatas = MakeCellData(_sheet, _token).ToList();
             SetNamedRange(_sheet, _cellDatas.Where(x => x.Type == DataType.Key));
-            _cellDatas.ForEach(x => x.Value.Dump(x.Cell));
+            _cellDatas.ForEach(x => x.Value.Spread(x.Cell));
         }
 
-        public void Dump(Excel.Range cell)
+        public void Spread(Excel.Range cell)
         {
             cell.Value2 = "{object}";
         }
