@@ -1,25 +1,25 @@
-[
-    {
-        "Id": 1234,
-        "Name": "hahaha",
-        "Roles": [
-            "admin",
-            "user"
-        ],
-        "Others": {
-            "A": "a",
-            "B": "b"
-        }
-    },
-    {
-        "Id": 678,
-        "Name": "jkw",
-        "Roles": [
-            "user"
-        ],
-        "Others": {
-            "A": "a",
-            "B": "b"
-        }
+﻿[
+  {
+    "Id": 1234,
+    "Name": "hahaha",
+    "Roles": [
+      "admin",
+      "user"
+    ],
+    "Others": {
+      "A": "a",
+      "B": "b"
     }
+  },
+  {
+    "Id": 678,
+    "Name": "jkw",
+    "Roles": [
+      "User"
+    ],
+    "Others": {
+      "A": "a",
+      "B": "b"
+    }
+  }
 ]

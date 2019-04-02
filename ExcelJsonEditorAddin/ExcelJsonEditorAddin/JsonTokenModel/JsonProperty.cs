@@ -12,7 +12,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
     {
         private JProperty _token;
 
-        public JsonTokenType Type() => _token.Type.ConvertToJsonTokenType();
+        public JsonTokenType Type() => JsonTokenType.Property;
         public JToken GetToken() => _token;
         public string Path() => GetToken()?.Path;
 

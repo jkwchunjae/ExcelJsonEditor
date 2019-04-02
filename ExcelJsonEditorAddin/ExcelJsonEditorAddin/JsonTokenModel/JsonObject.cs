@@ -12,9 +12,9 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         private Excel.Worksheet _sheet = null;
         private List<CellData> _cellDatas = new List<CellData>();
 
-        private readonly int _titleRow = 0;
+        private readonly int _titleRow = 1;
 
-        public JsonTokenType Type() => _token.Type.ConvertToJsonTokenType();
+        public JsonTokenType Type() => JsonTokenType.Object;
         public JToken GetToken() => _token;
         public string Path() => GetToken()?.Path;
 
@@ -32,8 +32,8 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         public void Spread(Excel.Worksheet sheet)
         {
             _sheet = sheet;
-            //((Excel.Range)_sheet.Range[_titleRow, 1]).Value2 = "Key";
-            //((Excel.Range)_sheet.Range[_titleRow, 2]).Value2 = "Value";
+            _sheet.Cells[_titleRow, 1].Value2 = "Key";
+            _sheet.Cells[_titleRow, 2].Value2 = "Value";
 
             _cellDatas = MakeCellData(_sheet, _token).ToList();
             SetNamedRange(_sheet, _cellDatas.Where(x => x.Type == DataType.Key));
@@ -67,7 +67,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public void OnChangeValue(Excel.Range target)
         {
-            var cellData = _cellDatas.FirstOrDefault(x => x.Address == target.Address);
+            var cellData = _cellDatas.FirstOrDefault(x => x.Cell.Address == target.Address);
 
             cellData?.Value.OnChangeValue(target);
 

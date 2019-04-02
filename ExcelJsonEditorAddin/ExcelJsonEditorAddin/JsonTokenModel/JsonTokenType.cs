@@ -9,6 +9,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
     public enum JsonTokenType
     {
         Array,
+        ObjectArray,
         Object,
         Property,
         Title,

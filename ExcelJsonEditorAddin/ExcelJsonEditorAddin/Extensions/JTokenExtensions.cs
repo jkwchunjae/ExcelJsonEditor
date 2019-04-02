@@ -3,35 +3,23 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using Utils;
 
 namespace ExcelJsonEditorAddin
 {
     public static class JTokenExtensions
     {
-        public static JsonTokenType ConvertToJsonTokenType(this JTokenType tokenType)
-        {
-            switch (tokenType)
-            {
-                case JTokenType.Array:
-                    return JsonTokenType.Array;
-                case JTokenType.Object:
-                    return JsonTokenType.Object;
-                case JTokenType.Property:
-                    return JsonTokenType.Property;
-                case JTokenType.String:
-                    return JsonTokenType.String;
-                case JTokenType.Integer:
-                case JTokenType.Float:
-                    return JsonTokenType.Number;
-                case JTokenType.Boolean:
-                    return JsonTokenType.Boolean;
-                default:
-                    return JsonTokenType.Other;
-            }
-        }
-
         public static IJsonToken CreateJsonToken(this JToken token)
         {
+            if (token.Type == JTokenType.Array)
+            {
+                var arrayToken = (JArray)token;
+                if (arrayToken.Any() && arrayToken[0].Type == JTokenType.Object)
+                {
+                    return new JsonObjectArray(arrayToken);
+                }
+            }
+
             switch (token.Type)
             {
                 case JTokenType.Array:
