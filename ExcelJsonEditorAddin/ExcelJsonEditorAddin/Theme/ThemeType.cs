@@ -14,4 +14,15 @@ namespace ExcelJsonEditorAddin.Theme
         White,
         Dark,
     }
+
+    public static class StyleName
+    {
+        public static string Normal => "Normal";
+        public static string Title => "JsonTitle";
+        public static string Number => "JsonNumber";
+        public static string String => "JsonString";
+        public static string Boolean => "JsonBoolean";
+        public static string Array => "JsonArray";
+        public static string Object => "JsonObject";
+    }
 }

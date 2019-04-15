@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ExcelJsonEditorAddin.Theme;
+using Newtonsoft.Json.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelJsonEditorAddin.JsonTokenModel
@@ -24,6 +25,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         public void Spread(Excel.Range cell)
         {
             cell.Value2 = (string)_token.Value;
+            cell.Style = StyleName.String;
             if (cell.Value2.ToString() != (string) _token.Value)
             {
                 cell.Value2 = "'" + (string) _token.Value;

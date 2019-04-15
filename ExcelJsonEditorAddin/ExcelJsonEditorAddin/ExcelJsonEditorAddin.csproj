@@ -193,6 +193,7 @@
     </Compile>
     <Compile Include="Extensions\IJsonTokenExtensions.cs" />
     <Compile Include="EditorData\CellData.cs" />
+    <Compile Include="Extensions\StyleExtensions.cs" />
     <Compile Include="Extensions\WorksheetExtensions.cs" />
     <Compile Include="JsonTokenModel\JsonObjectArray.cs" />
     <Compile Include="JsonTokenModel\JsonBoolean.cs" />

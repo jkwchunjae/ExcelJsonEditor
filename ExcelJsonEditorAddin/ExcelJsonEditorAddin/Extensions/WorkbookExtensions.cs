@@ -31,9 +31,9 @@ namespace ExcelJsonEditorAddin
             }
         }
 
-        public static IEnumerable<Excel.Style> ToEnumerable(this Excel.Styles styles)
+        public static IEnumerable<Excel.Style> StyleList(this Excel.Workbook book)
         {
-            foreach (Excel.Style style in styles)
+            foreach (Excel.Style style in book.Styles)
             {
                 yield return style;
             }
@@ -45,9 +45,10 @@ namespace ExcelJsonEditorAddin
             var jtoken = JsonConvert.DeserializeObject<JToken>(File.ReadAllText(jsonFilePath, Encoding.UTF8));
             var jsonToken = jtoken.CreateJsonToken();
 
+            book.ChangeTheme(settings.Theme);
+
             Excel.Worksheet sheet = book.SheetList().First();
             sheet.Spread(jsonToken, fileName);
-            book.ChangeTheme(settings.Theme);
 
             book.SaveForJsonEditor(fileName);
 
@@ -131,48 +132,20 @@ namespace ExcelJsonEditorAddin
 
         public static void ChangeTheme(this Excel.Workbook book, ThemeType themeType)
         {
-            var funcDic = new Dictionary<ThemeType, Action<Excel.Workbook>>()
-            {
-                [ThemeType.White] = ChangeThemeWhite,
-                [ThemeType.Dark] = ChangeThemeDark,
-            };
+            var normalStyle = book.Styles[StyleName.Normal];
+            normalStyle.SetDefaultStyle(themeType);
 
-            if (!funcDic.ContainsKey(themeType))
+            book.CreateStyle(StyleName.Number).SetNumberStyle(themeType);
+            book.CreateStyle(StyleName.String).SetStringStyle(themeType);
+        }
+
+        public static Excel.Style CreateStyle(this Excel.Workbook book, string styleName)
+        {
+            if (book.StyleList().Empty(x => x.Name == styleName))
             {
-                return;
+                book.Styles.Add(styleName);
             }
-
-            funcDic[themeType](book);
-        }
-
-        private static void ChangeThemeWhite(this Excel.Workbook book)
-        {
-            var style = book.Styles["Normal"];
-            style.Interior.ColorIndex = XlColorIndex.xlColorIndexNone;
-            style.Font.Color = Color.Black;
-            style.Borders.LineStyle = Excel.XlLineStyle.xlLineStyleNone;
-        }
-
-        private static void ChangeThemeDark(this Excel.Workbook book)
-        {
-            var style = book.Styles["Normal"];
-            style.Interior.Color = Color.FromArgb(30, 30, 30);
-            style.Font.Color = Color.FromArgb(220, 220, 220);
-
-            var borderIndexList = new List<Excel.XlBordersIndex>
-            {
-                Excel.XlBordersIndex.xlDiagonalDown,
-                Excel.XlBordersIndex.xlDiagonalUp,
-            };
-
-            style.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
-            style.Borders.Color = Color.FromArgb(80, 80, 80);
-            style.Borders.Weight = Excel.XlBorderWeight.xlThin;
-
-            borderIndexList.ForEach(index =>
-            {
-                style.Borders[index].LineStyle = Excel.XlLineStyle.xlLineStyleNone;
-            });
+            return book.Styles[styleName];
         }
 
         public static Excel.Workbook SpreadJsonToken(this Excel.Workbook book, Excel.Worksheet currentSheet, IJsonToken jsonToken)
