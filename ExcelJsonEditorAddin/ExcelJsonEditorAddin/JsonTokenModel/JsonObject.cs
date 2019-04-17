@@ -18,9 +18,9 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         public JToken GetToken() => _token;
         public string Path() => GetToken()?.Path;
 
-        public IEnumerable<JProperty> Keys => _cellDatas
+        public IEnumerable<string> Keys => _cellDatas
             .Where(x => x.Type == DataType.Key)
-            .Select(x => (JProperty)x.Key.GetToken());
+            .Select(x => x.Key.Title);
 
         public JsonObject(JObject jObject)
         {
@@ -83,7 +83,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                 {
                     Index = i,
                     Property = x,
-                    PropertyToken = x.CreateJsonToken(),
+                    PropertyToken = new JsonTitle(x.Name),
                     ValueToken = x.Value.CreateJsonToken(),
                 })
                 .SelectMany(x => new CellData[]
@@ -91,7 +91,6 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                     new CellData
                     {
                         Type = DataType.Key,
-                        Address = ((Excel.Range)sheet?.Cells[x.Index + _titleRow + 1, 1])?.Address,
                         Cell = (Excel.Range)sheet?.Cells[x.Index + _titleRow + 1, 1],
                         Key = x.PropertyToken,
                         Value = x.PropertyToken,
@@ -99,7 +98,6 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                     new CellData
                     {
                         Type = DataType.Value,
-                        Address = ((Excel.Range)sheet?.Cells[x.Index + _titleRow + 1, 2])?.Address,
                         Cell = (Excel.Range)sheet?.Cells[x.Index + _titleRow + 1, 2],
                         Key = x.PropertyToken,
                         Value = x.ValueToken,
@@ -110,7 +108,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         {
             keys.ToList().ForEach(x =>
             {
-                var propertyName = ((JProperty) x.Key.GetToken()).Name;
+                var propertyName = x.Key.Title;
                 sheet.Names.Add(propertyName, x.Cell.Offset[0, 1]);
             });
         }

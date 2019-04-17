@@ -17,10 +17,9 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
     public class CellData
     {
         public DataType Type { get; set; }
-        public string Address { get; set; }
         public Excel.Range Cell { get; set; }
         public int Index { get; set; }
-        public IJsonToken Key { get; set; }
+        public JsonTitle Key { get; set; }
         public IJsonToken Value { get; set; }
     }
 }

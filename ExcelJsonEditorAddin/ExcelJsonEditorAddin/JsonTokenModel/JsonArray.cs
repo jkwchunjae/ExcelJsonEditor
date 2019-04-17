@@ -90,7 +90,6 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                 {
                     Type = DataType.Value,
                     Index = x.Index,
-                    Address = x.Cell?.Address,
                     Cell = x.Cell,
                     Key = null,
                     Value = x.JToken,

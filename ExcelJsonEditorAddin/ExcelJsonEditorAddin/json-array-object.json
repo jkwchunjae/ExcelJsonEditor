@@ -2,24 +2,34 @@
   {
     "Id": 1234,
     "Name": "hahaha",
+    "Others": {
+      "Item1": "C#",
+      "Item2": "C++",
+      "Property": {
+        "Power": 456,
+        "ABCDEFG": "123qwe"
+      }
+    },
     "Roles": [
       "admin",
       "user"
     ],
-    "Others": {
-      "A": "a",
-      "B": "b"
-    }
+    "Checked": false
   },
   {
     "Id": 678,
     "Name": "jkw",
+    "Others": {
+      "Item1": "JavaScript",
+      "Item2": "NodeJs",
+      "Property": {
+        "Power": 123,
+        "ABCDEFG": "123qwe"
+      }
+    },
     "Roles": [
       "User"
     ],
-    "Others": {
-      "A": "a",
-      "B": "b"
-    }
+    "Checked": false
   }
 ]
