@@ -33,7 +33,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
             SetNamedRange(sheet, _cellDatas.Where(x => x.Type == DataType.Title));
 
-            _cellDatas.ForEach(x => x.Value.Spread(x.Cell));
+            _cellDatas.ForEach(x => x.Value?.Spread(x.Cell));
         }
 
         public void Spread(Excel.Range cell)
@@ -171,11 +171,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                     Type = DataType.Value,
                     Cell = sheet.Cells[x.Row, x.Column],
                     Key = x.JsonTitle,
-                    Value = x.Object.GetToken().SelectToken(x.JsonTitle.Title).CreateJsonToken(),
+                    Value = x.Object.GetToken().SelectToken(x.JsonTitle.Title)?.CreateJsonToken(),
                 })
                 .ToList();
 
-            newDatas.ForEach(x => x.Value.Spread(x.Cell));
+            newDatas.ForEach(x => x.Value?.Spread(x.Cell));
             cellDatas.AddRange(newDatas);
         }
 
