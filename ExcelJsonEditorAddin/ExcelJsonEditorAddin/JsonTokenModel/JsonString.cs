@@ -26,7 +26,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         {
             cell.Value2 = (string)_token.Value;
             cell.Style = StyleName.String;
-            if (cell.Value2.ToString() != (string) _token.Value)
+            if (cell.Value2?.ToString() != (string) _token.Value)
             {
                 cell.Value2 = "'" + (string) _token.Value;
             }
