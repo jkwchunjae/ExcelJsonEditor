@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Utils;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelJsonEditorAddin.JsonTokenModel

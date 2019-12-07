@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using ExcelJsonEditorAddin.EditorData;
-using Utils;
 using System.Windows.Forms;
 using System.Drawing;
 using ExcelJsonEditorAddin.Theme;

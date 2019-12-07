@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Utils;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace ExcelJsonEditorAddin.JsonTokenModel

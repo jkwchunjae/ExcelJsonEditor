@@ -15,7 +15,6 @@ using ExcelJsonEditorAddin.Extensions;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using ExcelJsonEditorAddin.EditorData;
-using Utils;
 
 namespace ExcelJsonEditorAddin
 {

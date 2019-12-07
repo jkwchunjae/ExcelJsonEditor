@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29512.175
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelJsonEditorAddin", "ExcelJsonEditorAddin\ExcelJsonEditorAddin.csproj", "{F921881A-0CD5-475F-9384-4421247A41C1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{D7E1873B-AE1C-4AA0-9A5A-DFDE3EC6BD24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{F921881A-0CD5-475F-9384-4421247A41C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F921881A-0CD5-475F-9384-4421247A41C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F921881A-0CD5-475F-9384-4421247A41C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7E1873B-AE1C-4AA0-9A5A-DFDE3EC6BD24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7E1873B-AE1C-4AA0-9A5A-DFDE3EC6BD24}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7E1873B-AE1C-4AA0-9A5A-DFDE3EC6BD24}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7E1873B-AE1C-4AA0-9A5A-DFDE3EC6BD24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
