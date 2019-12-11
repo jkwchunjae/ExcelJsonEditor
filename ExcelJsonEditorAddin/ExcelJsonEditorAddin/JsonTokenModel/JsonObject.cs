@@ -11,6 +11,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         private JObject _token;
         private Excel.Worksheet _sheet = null;
         private List<CellData> _cellDatas = new List<CellData>();
+        private Dictionary<string, IJsonToken> _detail;
 
         private readonly int _titleRow = 1;
 
@@ -18,15 +19,30 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         public JToken GetToken() => _token;
         public string Path() => GetToken()?.Path;
 
-        public IEnumerable<string> Keys => _cellDatas
-            .Where(x => x.Type == DataType.Key)
-            .Select(x => x.Key.Title);
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                if (_detail == null)
+                {
+                    _detail = _token
+                        .Properties()
+                        .ToDictionary(x => x.Name, x => x.Value.CreateJsonToken());
+                }
+                return _detail.Keys;
+            }
+        }
 
         public JsonObject(JObject jObject)
         {
             _token = jObject;
 
-            _cellDatas = MakeCellData(null, _token).ToList();
+            //_cellDatas = MakeCellData(null, _token).ToList();
+        }
+
+        public object ToValue()
+        {
+            return "{object}";
         }
 
         public void Spread(Excel.Worksheet sheet)
@@ -43,6 +59,18 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         public void Spread(Excel.Range cell)
         {
             cell.Value2 = "{object}";
+        }
+
+        public IJsonToken GetJsonToken(string key)
+        {
+            if (Keys.Contains(key))
+            {
+                return _detail[key];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)

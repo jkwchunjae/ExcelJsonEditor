@@ -29,6 +29,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             Title = path;
         }
 
+        public object ToValue()
+        {
+            return Title;
+        }
+
         public void AddChildTitle(JsonTitle title)
         {
             _childTitles.Add(title);

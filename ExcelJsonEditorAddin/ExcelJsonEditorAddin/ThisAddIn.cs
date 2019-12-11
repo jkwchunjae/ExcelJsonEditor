@@ -61,10 +61,10 @@ namespace ExcelJsonEditorAddin
                 book.Initialize(filePath, _settings);
                 _workbookList.Add(book);
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 book.Close(SaveChanges: false);
-                return;
             }
         }
 

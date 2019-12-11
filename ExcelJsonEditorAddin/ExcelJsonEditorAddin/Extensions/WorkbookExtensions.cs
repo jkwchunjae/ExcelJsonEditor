@@ -132,6 +132,9 @@ namespace ExcelJsonEditorAddin
 
         public static void ChangeTheme(this Excel.Workbook book, ThemeType themeType)
         {
+            if (book == null)
+                return;
+
             var normalStyle = book.Styles[StyleName.Normal];
             normalStyle.SetDefaultStyle(themeType);
 

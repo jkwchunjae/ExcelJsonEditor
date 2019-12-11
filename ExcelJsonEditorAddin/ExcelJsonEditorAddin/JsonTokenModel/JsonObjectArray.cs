@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JkwExtensions;
 using Newtonsoft.Json.Linq;
@@ -10,7 +11,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
     {
         private JArray _token;
         private Excel.Worksheet _sheet = null;
-        private List<CellData> _cellDatas = new List<CellData>();
+        private List<CellData> _cellDataList = new List<CellData>();
 
         private readonly int _titleRow = 1;
 
@@ -23,17 +24,71 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _token = jArray;
         }
 
+        public object ToValue()
+        {
+            return "[array]";
+        }
+
         public void Spread(Excel.Worksheet sheet)
         {
             _sheet = sheet;
 
-            _cellDatas = MakeTitle(_sheet, _token).ToList();
-            FillCellData(_sheet, _token, _cellDatas);
+            var tokenArray = _token;
 
+            var objectList = tokenArray
+                .Where(x => x.Type == JTokenType.Object)
+                .Select((x, i) => new { Index = i, Object = (JsonObject)x.CreateJsonToken() })
+                .ToList();
 
-            SetNamedRange(sheet, _cellDatas.Where(x => x.Type == DataType.Title));
+            var titleColumnDic = objectList
+                .SelectMany(x => x.Object.Keys)
+                .Distinct()
+                .Select((x, i) => new { Column = i, Title = x })
+                .ToDictionary(x => x.Title, x => x.Column);
 
-            _cellDatas.ForEach(x => x.Value?.Spread(x.Cell));
+            Excel.Range minCell = _sheet.Cells[_titleRow, 1];
+            Excel.Range maxCell = _sheet.Cells[objectList.Count + _titleRow, titleColumnDic.Count];
+            var rowsCount = maxCell.Row - minCell.Row + _titleRow;
+            var columnsCount = maxCell.Column - minCell.Column + 1;
+            var data = new object[rowsCount, columnsCount];
+
+            titleColumnDic.OrderBy(x => x.Value).ForEach(x =>
+            {
+                var row = 0;
+                var column = x.Value;
+                var title = x.Key;
+                data[row, column] = title;
+                _cellDataList.Add(new CellData
+                {
+                    Cell = _sheet.Cells[_titleRow, column + 1],
+                    Key = new JsonTitle(title),
+                    Type = DataType.Title,
+                });
+            });
+
+            objectList.ForEach(x =>
+            {
+                var row = x.Index + 1;
+                x.Object.Keys.ForEach(key =>
+                {
+                    var column = titleColumnDic[key];
+                    var jsonToken = x.Object.GetJsonToken(key);
+                    if (jsonToken != null)
+                    {
+                        data[row, column] = jsonToken.ToValue();
+                        _cellDataList.Add(new CellData
+                        {
+                            Index = x.Index,
+                            Cell = _sheet.Cells[row + _titleRow, column + 1],
+                            Value = jsonToken,
+                            Type = DataType.Value,
+                        });
+                    }
+                });
+            });
+
+            var range = _sheet.get_Range(minCell.Address, maxCell.Address);
+            range.Value2 = data;
         }
 
         public void Spread(Excel.Range cell)
@@ -43,12 +98,14 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)
         {
-            if (_cellDatas.Empty(x => x.Cell.Address == target.Address))
+            if (_cellDataList.Empty(x => x.Cell.Address == target.Address))
             {
                 return false;
             }
 
-            var cellData = _cellDatas.First(x => x.Cell.Address == target.Address);
+            return true;
+
+            var cellData = _cellDataList.First(x => x.Cell.Address == target.Address);
             if (cellData.Value.CanSpreadType())
             {
                 book.SpreadJsonToken(_sheet, cellData.Value);
@@ -62,14 +119,14 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
                     var right = cellData.Cell.Offset[0, cellData.Key.ColumnCount - 1];
 
                     var childs = cellData.Key.ChildTitles;
-                    _cellDatas = _cellDatas.Where(x => !childs.Contains(x.Key)).ToList();
+                    _cellDataList = _cellDataList.Where(x => !childs.Contains(x.Key)).ToList();
                     childs.ForEach(x => cellData.Key.RemoveChildTitle(x));
 
                     _sheet.Range[left, right].EntireColumn.Delete();
                 }
                 else
                 {
-                    var titles = _cellDatas.Where(x => x.Cell.Column == cellData.Cell.Column)
+                    var titles = _cellDataList.Where(x => x.Cell.Column == cellData.Cell.Column)
                         .Where(x => x.Type == DataType.Value)
                         .Select(x => (JsonObject)x.Value)
                         .SelectMany(x => x.Keys)
@@ -102,8 +159,8 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
                     titleCellDatas.ForEach(x => x.Key.Spread(x.Cell));
                     titleCellDatas.ForEach(x => cellData.Key.AddChildTitle(x.Key));
-                    _cellDatas.AddRange(titleCellDatas);
-                    FillCellData(_sheet, _token, _cellDatas);
+                    _cellDataList.AddRange(titleCellDatas);
+                    //FillCellData(_sheet, _token, _cellDatas);
                 }
                 Globals.ThisAddIn.Application.EnableEvents = true;
             }
@@ -117,71 +174,14 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public void OnChangeValue(Excel.Range target)
         {
-            var cellData = _cellDatas.FirstOrDefault(x => x.Cell.Address == target.Address);
+            var cellData = _cellDataList.FirstOrDefault(x => x.Cell.Address == target.Address);
 
             cellData?.Value.OnChangeValue(target);
         }
 
-        private List<CellData> MakeTitle(Excel.Worksheet sheet, JArray token)
-        {
-            var titles = token.Where(x => x.Type == JTokenType.Object)
-                .Select(x => (JsonObject)x.CreateJsonToken())
-                .SelectMany(x => x.Keys)
-                .GroupBy(x => x)
-                .Select(x => new JsonTitle(x.First()))
-                .Select((x, i) => new
-                {
-                    Index = i,
-                    JsonTitle = x,
-                    Cell = sheet.Cells[_titleRow, i + 1],
-                })
-                .Select(x => new CellData
-                {
-                    Type = DataType.Title,
-                    Cell = x.Cell,
-                    Index = x.Index,
-                    Key = x.JsonTitle,
-                    Value = x.JsonTitle,
-                })
-                .ToList();
-
-            return titles;
-        }
-
-        private void FillCellData(Excel.Worksheet sheet, JArray token, List<CellData> cellDatas)
-        {
-            var titles = cellDatas.Where(x => x.Type == DataType.Title).ToList();
-
-            var objects = token.Where(x => x.Type == JTokenType.Object)
-                .Select((x, i) => new { Row = _titleRow + i + 1, JsonObject = (JsonObject)x.CreateJsonToken() })
-                .ToList();
-
-            var newDatas = titles.Join(objects, a => 1, b => 1, (title, obj) => new { Title = title, Object = obj })
-                .Select(x => new
-                {
-                    x.Object.Row,
-                    x.Title.Cell.Column,
-                    x.Title,
-                    JsonTitle = (JsonTitle)x.Title.Key,
-                    Object = x.Object.JsonObject,
-                })
-                .Where(x => cellDatas.Empty(e => e.Cell.Row == x.Row && e.Cell.Column == x.Column))
-                .Select(x => new CellData
-                {
-                    Type = DataType.Value,
-                    Cell = sheet.Cells[x.Row, x.Column],
-                    Key = x.JsonTitle,
-                    Value = x.Object.GetToken().SelectToken(x.JsonTitle.Title)?.CreateJsonToken(),
-                })
-                .ToList();
-
-            newDatas.ForEach(x => x.Value?.Spread(x.Cell));
-            cellDatas.AddRange(newDatas);
-        }
-
         private void SetNamedRange(Excel.Worksheet sheet, IEnumerable<CellData> titles)
         {
-            titles.ToList().ForEach(x =>
+            titles.ForEach(x =>
             {
                 var jsonTitle = (JsonTitle)x.Key;
                 var columnText = x.Cell.Address.Split('$').FirstOrDefault(e => e.Length > 0);

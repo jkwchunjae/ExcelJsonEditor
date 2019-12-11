@@ -23,6 +23,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _token = jArray;
         }
 
+        public object ToValue()
+        {
+            return "[array]";
+        }
+
         public void Spread(Excel.Worksheet sheet)
         {
             _sheet = sheet;
@@ -36,7 +41,22 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             {
                 _cellDatas = MakeCellData(_sheet, _token).ToList();
 
-                _cellDatas.ForEach(x => x.Value.Spread(x.Cell));
+                //_cellDatas.ForEach(x => x.Value.Spread(x.Cell));
+                Excel.Range minCell = _sheet.Cells[_cellDatas.Min(x => x.Cell.Row), _cellDatas.Min(x => x.Cell.Column)];
+                Excel.Range maxCell = _sheet.Cells[_cellDatas.Max(x => x.Cell.Row), _cellDatas.Max(x => x.Cell.Column)];
+                var rowsCount = maxCell.Row - minCell.Row + 1;
+                var columnsCount = maxCell.Column - minCell.Column + 1;
+                var data = new object[rowsCount, columnsCount];
+
+                _cellDatas.ForEach(cellData =>
+                {
+                    var row = cellData.Cell.Row - minCell.Row;
+                    var column = cellData.Cell.Column - minCell.Column;
+                    data[row, column] = cellData.Value.ToValue();
+                });
+
+                var range = _sheet.get_Range(minCell.Address, maxCell.Address);
+                range.Value2 = data;
             }
         }
 

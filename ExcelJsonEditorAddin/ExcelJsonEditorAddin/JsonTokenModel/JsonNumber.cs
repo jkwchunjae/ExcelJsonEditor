@@ -17,6 +17,11 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
             _token = jValue;
         }
 
+        public object ToValue()
+        {
+            return _token.Value;
+        }
+
         public void Spread(Excel.Worksheet ws)
         {
         }

@@ -13,6 +13,7 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
         JsonTokenType Type();
         JToken GetToken();
         string Path();
+        object ToValue();
 
         void Spread(Excel.Worksheet worksheet);
         void Spread(Excel.Range cell);
