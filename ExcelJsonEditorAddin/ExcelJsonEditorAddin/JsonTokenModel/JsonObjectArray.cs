@@ -98,19 +98,28 @@ namespace ExcelJsonEditorAddin.JsonTokenModel
 
         public bool OnDoubleClick(Excel.Workbook book, Excel.Range target)
         {
-            if (_cellDataList.Empty(x => x.Cell.Address == target.Address))
+            try
+            {
+                if (_cellDataList.Empty(x => x.Cell.Address == target.Address))
+                {
+                    return false;
+                }
+            }
+            catch
             {
                 return false;
             }
 
-            return true;
-
-            var cellData = _cellDataList.First(x => x.Cell.Address == target.Address);
-            if (cellData.Value.CanSpreadType())
+            var cellData = _cellDataList.FirstOrDefault(x => x.Cell.Address == target.Address);
+            if (cellData == null)
+            {
+                return true;
+            }
+            else if (cellData.Value?.CanSpreadType() ?? false)
             {
                 book.SpreadJsonToken(_sheet, cellData.Value);
             }
-            if (cellData.Value.Type() == JsonTokenType.Title)
+            else if (cellData.Type == DataType.Title)
             {
                 Globals.ThisAddIn.Application.EnableEvents = false;
                 if (cellData.Key.Extended)
